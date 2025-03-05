@@ -48,6 +48,7 @@ Given the above, I **recommend using Bayesian testing**, but ensuring a **minimu
 ---
 
 ## **📌 Python Code for A/B Test Analysis**
+
 ### **1️⃣ Frequentist Test (Two-Proportion Z-Test)**
 ```python
 import numpy as np
@@ -84,5 +85,30 @@ ci_upper = lift + z_critical * se_lift
 print(f"Z-Score: {z_score:.4f}")
 print(f"P-Value: {p_value_z_test:.4f}")
 print(f"Lift Estimate: {lift * 100:.2f}%")
-print(f"95% Confidence Interval for Lift: ({ci_lower * 100:.2f}%, {ci_upper * 100:.2f}%)")
+print(f"95% Confidence Interval for Lift: ({ci_lower * 100:.2f}%, {ci_upper * 100:.2f}%)") 
+```
+##
+2️⃣ Bayesian Test (Beta-Binomial)
+```python
+from scipy.stats import beta
 
+# Bayesian Approach: Compute Posterior Beta Distributions
+alpha_prior, beta_prior = 1, 1  # Non-informative prior
+
+# Posterior parameters
+alpha_A = alpha_prior + cert_A
+beta_A = beta_prior + (total_A - cert_A)
+alpha_B = alpha_prior + cert_B
+beta_B = beta_prior + (total_B - cert_B)
+
+# Compute posterior means
+posterior_mean_A = alpha_A / (alpha_A + beta_A)
+posterior_mean_B = alpha_B / (alpha_B + beta_B)
+
+# Compute probability that B is better than A
+prob_B_better_than_A = 1 - beta.cdf(posterior_mean_A, alpha_B, beta_B)
+
+print(f"Posterior Mean (A): {posterior_mean_A:.4f}")
+print(f"Posterior Mean (B): {posterior_mean_B:.4f}")
+print(f"Probability that B is better than A: {prob_B_better_than_A:.4f}")
+```
