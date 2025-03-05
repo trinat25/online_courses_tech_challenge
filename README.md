@@ -9,6 +9,6 @@ I focus on connecting acquisition channels to user journeys, optimising the sign
 Let’s build better user experiences through data—I strive to add value from day one. 🚀
 
 ## Table of Contents 
-1. [Phase 1 Proposal of statistical test to evaluate effectiveness of a new course feature]
+1. [Phase 1 Proposal of statistical test to evaluate effectiveness of a new course feature](https://github.com/trinat25/online_courses_tech_challenge/blob/main/phase%201.md)
 2. [Exploratory Data Analysis]
 3. [Summary]
