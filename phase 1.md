@@ -1,114 +1,83 @@
-# Phase 1: Choosing a Statistical Test for A/B Testing
+# Phase 1: Choosing a Statistical Test for A/B Testing  
 
-For this A/B test, I propose using **both a Frequentist (Two-Proportion Z-Test) and a Bayesian approach** to determine if there is a significant difference in certification rates between the control group (A) and the treatment group (B).
+To evaluate the impact of a new course feature on certification rates, we compare two statistical approaches:  
 
-While both methods provide insights, **I ultimately recommend using the Bayesian approach** for decision-making.
+1. **Frequentist (Two-Proportion Z-Test)** – A standard hypothesis test that requires a pre-defined sample size.  
+2. **Bayesian (Beta-Binomial)** – Provides a probability that the treatment outperforms the control, allowing for continuous monitoring.  
 
----
-
-# Phase 1: A/B Test Results – Frequentist vs Bayesian Approach
-
-## **1️⃣ Frequentist Test (Two-Proportion Z-Test)**
-- **Z-Score**: **1.9546**
-- **P-Value**: **0.0506**
-- **Lift Estimate**: **13.75%** (B is estimated to have a 13.75% higher certification rate than A)
-- **95% Confidence Interval for Lift**: **(7.56%, 19.93%)**
-- **Conclusion**: *Fail to Reject Null Hypothesis* (at the 0.05 threshold)
-
-### **Does "Fail to Reject Null" mean B is not better than A?**
-No. It means that **the evidence is not strong enough** to conclude that B is **statistically significantly** better than A, **given the threshold of 0.05**.  
-However, this does **not mean** that B isn't better—it only means we can't **rule out the possibility that the observed effect is due to chance**.
+I recommend the **Bayesian approach** as it delivers **more intuitive and actionable results**, avoiding rigid significance thresholds.  
 
 ---
 
-## **2️⃣ Bayesian Test (Beta-Binomial)**
-- **Posterior Mean for A (Control)**: **0.4495** (~44.95% certification rate)
-- **Posterior Mean for B (Treatment)**: **0.5110** (~51.10% certification rate)
-- **Probability that B is better than A**: **99.71%**
-- **Conclusion**: *P(B > A) = 0.9971*, strong evidence that **B is better than A**.
+## 🔬 Hypothesis for Each Approach  
 
-### **Interpretation of Bayesian Results**
-- Instead of a **p-value**, Bayesian testing gives us a **probability**: we are **~99.7% confident** that **B outperforms A**.
-- This is **easier to interpret** and **more actionable** than a p-value.
-- However, Bayesian testing **can lead to early stopping** if not monitored correctly.
+| **Approach**  | **Null Hypothesis (\(H_0\))** | **Alternative Hypothesis (\(H_1\))** |
+|--------------|---------------------------------|---------------------------------|
+| **Frequentist (Z-Test)** | The certification rate of treatment (B) is **less than or equal to** the control (A). \(H_0: p_B \leq p_A\) | The certification rate of treatment (B) is **higher** than control (A). \(H_1: p_B > p_A\) |
+| **Bayesian (Beta-Binomial)** | No strict \(H_0\), instead we calculate the probability that B is better than A. | Computes \( P(B > A) \), which gives the probability that B outperforms A. |
+
+---
+## 🔬 Frequentist Test (Two-Proportion Z-Test)  
+- **Z-Score**: **1.95**  
+- **P-Value**: **0.0506**  
+- **Lift Estimate**: **+13.75%**  
+- **95% CI for Lift**: **(7.56%, 19.93%)**  
+- **Conclusion**: *Fail to reject null hypothesis (p = 0.0506)*  
+
+> ❓ *Does this mean B is not better than A?*  
+Not necessarily. The result suggests **insufficient evidence at p = 0.05**, but does not rule out a real effect.  
 
 ---
 
-## **📌 Key Takeaways**
-| **Aspect**  | **Frequentist (Z-Test)** | **Bayesian (Beta-Binomial)** |
-|------------|----------------------|--------------------------|
-| **Interpretability** | P-value (0.0506) tells us if we reject H₀ | **P(B > A) = 0.9971**, a probability-based decision |
-| **Confidence Interval for Lift** | (7.56%, 19.93%) | Bayesian model does not provide a CI for lift directly |
-| **Decision Making** | Needs a fixed sample size, can’t continuously monitor | Can update posterior probability as data comes in |
-| **Early Stopping Risk** | No, requires a fixed test duration | Yes, risk of stopping too soon |
-| **Business Relevance** | Harder to explain to stakeholders | More intuitive (probability-based) |
+## 🎯 Bayesian Test (Beta-Binomial)  
+- **Posterior Mean for A**: **0.4495** (~44.95% certification rate)  
+- **Posterior Mean for B**: **0.5110** (~51.10% certification rate)  
+- **Probability B is better than A**: **99.71%**  
+- **Conclusion**: *High confidence that B outperforms A (P = 0.9971)*  
 
-Given the above, I **recommend using Bayesian testing**, but ensuring a **minimum test duration** to avoid premature stopping.
+> ✅ **Why Bayesian?**  
+- More **intuitive**: Instead of a p-value, we get **P(B > A) = 99.71%**, which is easier for stakeholders to understand.  
+- **No fixed sample size needed** – results can be monitored continuously without inflating false positives.  
+- Avoids arbitrary significance thresholds.  
 
 ---
 
-## **📌 Python Code for A/B Test Analysis**
+## 🔍 Are the Outcomes Different?  
 
-### **1️⃣ Frequentist Test (Two-Proportion Z-Test)**
-```python
-import numpy as np
-import pandas as pd
-import scipy.stats as stats
+At first glance, the two approaches might seem to give different conclusions, but they actually answer **different questions**:
 
-# Compute proportions and sample sizes for A and B
-cert_A = contingency_table.loc['A', 1]
-total_A = contingency_table.loc['A'].sum()
-cert_B = contingency_table.loc['B', 1]
-total_B = contingency_table.loc['B'].sum()
+| **Method**  | **Question Being Answered** | **Outcome** |
+|------------|----------------------------|------------|
+| **Frequentist (Z-Test)** | *"Is the observed difference significant at p < 0.05?"* | **No (p = 0.0506 is slightly above the threshold)** |
+| **Bayesian** | *"What is the probability that B is better than A?"* | **Very high (99.71%)** |
 
-# Proportions
-p_A = cert_A / total_A
-p_B = cert_B / total_B
+**Key Takeaways:**  
+- The **frequentist approach** relies on a **fixed p-value threshold (0.05)**, meaning results can be inconclusive even if a real effect exists.  
+- The **Bayesian approach** does not depend on rejecting a null hypothesis but **quantifies our confidence** that B is better than A.  
+- **Final decision-making is easier with Bayesian results** because we can communicate a probability rather than a statistical rejection rule.  
 
-# Pooled proportion for standard error calculation
-p_pooled = (cert_A + cert_B) / (total_A + total_B)
-se_pooled = np.sqrt(p_pooled * (1 - p_pooled) * (1 / total_A + 1 / total_B))
+---
 
-# Compute Z-score
-z_score = (p_B - p_A) / se_pooled
+## 🔍 Key Takeaways  
 
-# Compute p-value for two-tailed test
-p_value_z_test = 2 * (1 - stats.norm.cdf(abs(z_score)))
+| Aspect  | Frequentist (Z-Test) | Bayesian (Beta-Binomial) |
+|---------|----------------------|--------------------------|
+| **Interpretability** | P-value (0.0506) | **P(B > A) = 99.71%** |
+| **Lift Estimate** | (7.56%, 19.93%) | No direct CI, but probability-based |
+| **Decision Making** | Fixed sample size, no early stopping | Flexible, but requires monitoring for stopping bias |
+| **Business Impact** | Harder to explain | **More actionable for product teams** |
 
-# Compute the confidence interval for the lift
-lift = (p_B - p_A) / p_A  # Relative lift calculation
-se_lift = np.sqrt((p_A * (1 - p_A) / total_A) + (p_B * (1 - p_B) / total_B))
-z_critical = stats.norm.ppf(0.975)  # 1.96 for 95% CI
-ci_lower = lift - z_critical * se_lift
-ci_upper = lift + z_critical * se_lift
+**Recommendation**: Bayesian testing offers a **clearer probability-based decision framework**, making it the preferred choice for business decision-making. However, ensuring a **minimum test duration** is critical to avoid premature conclusions.  
 
-print(f"Z-Score: {z_score:.4f}")
-print(f"P-Value: {p_value_z_test:.4f}")
-print(f"Lift Estimate: {lift * 100:.2f}%")
-print(f"95% Confidence Interval for Lift: ({ci_lower * 100:.2f}%, {ci_upper * 100:.2f}%)") 
-```
-##
-2️⃣ Bayesian Test (Beta-Binomial)
-```python
-from scipy.stats import beta
+---
 
-# Bayesian Approach: Compute Posterior Beta Distributions
-alpha_prior, beta_prior = 1, 1  # Non-informative prior
+## 🏆 Beyond the Test: What Makes a Practical Analyst?  
+Selecting the right statistical method is **just one part** of impactful A/B testing. A great analyst also considers:  
 
-# Posterior parameters
-alpha_A = alpha_prior + cert_A
-beta_A = beta_prior + (total_A - cert_A)
-alpha_B = alpha_prior + cert_B
-beta_B = beta_prior + (total_B - cert_B)
+1. **Test Worthiness** – Is the expected uplift meaningful? Is the audience large enough?  
+2. **Business Context** – Are there **seasonality effects** or other confounding factors?  
+3. **Secondary Metrics** – Does certification rate improvement come at the expense of revenue, engagement, or churn?  
+4. **Influence & Communication** – Can results be translated into **clear, actionable insights** for decision-makers?  
 
-# Compute posterior means
-posterior_mean_A = alpha_A / (alpha_A + beta_A)
-posterior_mean_B = alpha_B / (alpha_B + beta_B)
+**Conclusion:** Bayesian testing is a strong choice, but **a great analyst ensures the test is set up for success beyond just statistics**.  
 
-# Compute probability that B is better than A
-prob_B_better_than_A = 1 - beta.cdf(posterior_mean_A, alpha_B, beta_B)
-
-print(f"Posterior Mean (A): {posterior_mean_A:.4f}")
-print(f"Posterior Mean (B): {posterior_mean_B:.4f}")
-print(f"Probability that B is better than A: {prob_B_better_than_A:.4f}")
-```
