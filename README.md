@@ -16,4 +16,4 @@ Let’s build better user experiences through data—I strive to add value from 
    - [`nevents` vs `ndays_act`](https://github.com/trinat25/online_courses_tech_challenge/blob/main/phase_2/nevents_vs_ndays_act.md)
    - [Grades segmentation](https://github.com/trinat25/online_courses_tech_challenge/blob/main/phase_2/grades.md)
    - [Course completion](https://github.com/trinat25/online_courses_tech_challenge/blob/main/phase_2/course_completion.md)
-3. [Summary](#summary)
+3. [Summary](https://github.com/trinat25/online_courses_tech_challenge/blob/main/Phase_3.md)
